@@ -148,7 +148,11 @@ export default function AddMaterialForm(props) {
         {/* Published At */}
         <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-3">
           <span>Chop etilgan yil*</span>
-          <Select value={selectedYear} onValueChange={setSelectedYear}>
+          <Select
+            name="year"
+            value={selectedYear}
+            onValueChange={setSelectedYear}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Chop etilgan yilni tanlang" />
             </SelectTrigger>
@@ -165,7 +169,11 @@ export default function AddMaterialForm(props) {
         {/* Country */}
         <Label className="grid w-full items-start gap-1.5">
           <span>Davlat*</span>
-          <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+          <Select
+            name="country"
+            value={selectedCountry}
+            onValueChange={setSelectedCountry}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Davlatni tanlang" />
             </SelectTrigger>
@@ -182,7 +190,11 @@ export default function AddMaterialForm(props) {
         {/* Language */}
         <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-4">
           <span>Til*</span>
-          <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+          <Select
+            name="language"
+            value={selectedLanguage}
+            onValueChange={setSelectedLanguage}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Tilni tanlang" />
             </SelectTrigger>
@@ -205,6 +217,7 @@ export default function AddMaterialForm(props) {
           <Select
             value={selectedResourceType}
             onValueChange={setSelectedResourceType}
+            name="resourceType"
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Resurs turini tanlang" />
