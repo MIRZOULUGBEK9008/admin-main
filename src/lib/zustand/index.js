@@ -4,7 +4,7 @@ export const useAppStore = create((set) => {
   return {
     materials: [],
     admin: null,
-    addItemDrawer: {
+    crudDrawer: {
       modal: false,
       title: null,
       description: null,
@@ -23,15 +23,38 @@ export const useAppStore = create((set) => {
         }
       });
     },
+    deleteMaterial(id) {
+      return set((state) => {
+        const materials = state.materials.filter((el) => el.id !== id);
+        return { materials };
+      });
+    },
+    updateMaterial(data) {
+      return set((state) => {
+        const materials = state.materials.map((el) => {
+          if (el.id === data.id) {
+            return data;
+          } else {
+            return el;
+          }
+        });
+        return { materials };
+      });
+    },
     setAdmin(value) {
       return set(() => {
         return { admin: value };
       });
     },
-    setAddItemDrawer(value) {
+    setCrudDrawer(value) {
+      let items = {};
+      if (!value) {
+        items = { gKeywords: [], gAuthors: [], gCoverImage: null };
+      }
       return set((state) => {
         return {
-          addItemDrawer: { ...value, modal: !state.addItemDrawer.modal },
+          ...items,
+          crudDrawer: { ...value, modal: !state.crudDrawer.modal },
         };
       });
     },

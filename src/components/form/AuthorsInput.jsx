@@ -10,9 +10,15 @@ import { warnMessages } from "@/constants";
 import { XIcon } from "lucide-react";
 import { useAppStore } from "@/lib/zustand";
 
-export default function AuthoursInput() {
+export default function AuthoursInput({ edited }) {
   const { setGAuthors, gAuthors } = useAppStore();
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (edited) {
+      setGAuthors(edited);
+    }
+  }, []);
 
   function handleAdd() {
     const value = inputRef.current.value;

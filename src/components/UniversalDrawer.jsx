@@ -10,19 +10,19 @@ import {
 import { useAppStore } from "@/lib/zustand";
 
 export default function UniversalDrawer() {
-  const { addItemDrawer, setAddItemDrawer } = useAppStore();
+  const { crudDrawer, setCrudDrawer } = useAppStore();
 
   return (
-    <Sheet open={addItemDrawer.modal} onOpenChange={setAddItemDrawer}>
+    <Sheet open={crudDrawer.modal} onOpenChange={setCrudDrawer}>
       <SheetContent
         style={{
-          maxWidth: `${addItemDrawer.width}%`,
+          maxWidth: `${crudDrawer.width}%`,
           width: "100%",
         }}
       >
-        <SheetHeader className="py-1">
-          <SheetTitle>{addItemDrawer.title}</SheetTitle>
-          <SheetDescription>{addItemDrawer.description}</SheetDescription>
+        <SheetHeader className="py-2">
+          <SheetTitle>{crudDrawer.title}</SheetTitle>
+          <SheetDescription>{crudDrawer.description}</SheetDescription>
         </SheetHeader>
         <div
           style={{
@@ -30,7 +30,7 @@ export default function UniversalDrawer() {
           }}
           className="h-full overflow-y-auto py-5 scroll-smooth"
         >
-          {addItemDrawer.children}
+          {crudDrawer.children}
         </div>
       </SheetContent>
     </Sheet>

@@ -82,22 +82,22 @@ export function validate(element, type) {
       };
     }
 
-    if (country === undefined) {
+    if (!country) {
       return { target: "country", message: warnMessages.empty.country };
     }
 
-    if (language === undefined) {
+    if (!language) {
       return { target: "language", message: warnMessages.empty.language };
     }
 
-    if (resourceType === undefined) {
+    if (!resourceType) {
       return {
         target: "resourceType",
         message: warnMessages.empty.resourceType,
       };
     }
 
-    if (isURL(source) === false) {
+    if (!isURL(source)) {
       return {
         target: "source",
         message: warnMessages.empty.source,
@@ -122,6 +122,13 @@ export function validate(element, type) {
       return {
         target: "summary",
         message: warnMessages.empty.summary,
+      };
+    }
+
+    if (summary?.trim().length <= 30) {
+      return {
+        target: "summary",
+        message: warnMessages.less.summary,
       };
     }
 

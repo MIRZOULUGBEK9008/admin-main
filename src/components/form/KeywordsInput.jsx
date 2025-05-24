@@ -9,9 +9,16 @@ import { warnMessages } from "@/constants";
 import { XIcon } from "lucide-react";
 import { useAppStore } from "@/lib/zustand";
 
-export default function KeywordsInput() {
+export default function KeywordsInput({ edited }) {
   const { setGKeywords, gKeywords } = useAppStore();
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (edited) {
+      setGKeywords(edited);
+    }
+  }, []);
+
   function handleAdd() {
     const value = inputRef.current.value;
     const length = value.trim().length;

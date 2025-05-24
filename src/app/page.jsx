@@ -7,10 +7,10 @@ import Header from "@/components/Header";
 import UniversalDrawer from "@/components/UniversalDrawer";
 import { Button } from "@/components/ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
-import AddMaterialForm from "@/components/form/AddMaterialForm";
+import CRUDMaterialForm from "@/components/form/CRUDMaterialForm";
 
 export default function page() {
-  const { admin, setAddItemDrawer, setAdmin } = useAppStore();
+  const { admin, setCrudDrawer, setAdmin } = useAppStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -25,12 +25,12 @@ export default function page() {
   }, []);
 
   function handleDrawer() {
-    setAddItemDrawer({
+    setCrudDrawer({
       title: "Yangi material qo'shish",
       description:
         "Bu yerga qo'shgan ma'lumotlarinigiz chizlab.uz saytida ko'rinadi",
       width: 80,
-      children: <AddMaterialForm />,
+      children: <CRUDMaterialForm />,
     });
   }
 

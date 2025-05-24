@@ -43,6 +43,9 @@ export const warnMessages = {
     inputKeywords: "Ushbu kalit so'z allaqachon qo'shilgan",
     inputAuthors: "Ushbu muallif allaqachon qo'shilgan",
   },
+  less: {
+    summary: "Tavsif eng kamida 30ta belgidan iborat bo'lishi kerak",
+  },
 };
 
 export const form = {
@@ -57,7 +60,7 @@ export const form = {
   ],
   languages: ["O'zbek", "Qoraqalpoq", "Turkman", "Rus", "Ingliz"],
   resourceTypes: [
-    "Elektron o'quv qo'llanma",
+    "O'quv qo'llanma",
     "Tezis",
     "Maqola",
     "Darslik",

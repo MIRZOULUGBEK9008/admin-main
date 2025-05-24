@@ -13,112 +13,120 @@ import KeywordsInput from "./KeywordsInput";
 import AuthoursInput from "./AuthorsInput";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
-import { BookmarkIcon, PlusIcon } from "@radix-ui/react-icons";
+import { BookmarkIcon } from "@radix-ui/react-icons";
 import { getFormData, validate } from "@/lib/utils";
 import { useAppStore } from "@/lib/zustand";
 import { toast } from "sonner";
 import { useEffect, useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { addData, uploadFile } from "@/requests";
+import { Edit, Loader2 } from "lucide-react";
+import { addData, updateData, uploadFile } from "@/requests";
 import UploadFile from "./UploadFile";
+import { useRouter } from "next/navigation";
 
-export default function AddMaterialForm(props) {
-  const { changeData } = props;
-
+export default function CRUDMaterialForm({ edited }) {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  const [data, setData] = useState({
-    addedData: null,
-    isLoading: false,
-    action: "one",
-  });
   const formRef = useRef(null);
-  const [selectedYear, setSelectedYear] = useState(undefined);
-  const [selectedCountry, setSelectedCountry] = useState(undefined);
-  const [selectedLanguage, setSelectedLanguage] = useState(undefined);
-  const [selectedResourceType, setSelectedResourceType] = useState(undefined);
 
   const {
     gAuthors,
     gKeywords,
     gCoverImage,
     admin,
-    setGAuthors,
-    setGKeywords,
-    setGCoverImage,
-    setAddItemDrawer,
+    updateMaterial,
+    setCrudDrawer,
     setMaterials,
     setAdmin,
   } = useAppStore();
 
+  // Reset
   function reset() {
     formRef?.current?.reset();
-    setSelectedYear(undefined);
-    setSelectedCountry(undefined);
-    setSelectedLanguage(undefined);
-    setSelectedResourceType(undefined);
-    setGAuthors([]);
-    setGKeywords([]);
-    setGCoverImage(null);
   }
 
-  useEffect(() => {
-    async function send(data) {
-      const changeFileToLink = await uploadFile(data.cover);
-      data.cover = changeFileToLink;
-      addData("/materials", data, admin.access_token)
-        .then(({ message, data }) => {
-          setMaterials(data, "one");
-          toast.success(message);
-        })
-        .catch(({ message }) => {
-          if (message === errorMessages[403]) {
-            setAdmin(null);
-            router.push("/");
-            if (typeof window !== "undefined") {
-              localStorage.removeItem("user");
-            }
-          }
-          toast.error(message);
-        })
-        .finally(() => {
-          setData((prev) => {
-            return { ...prev, isLoading: false, addedData: null };
-          });
-        });
+  // Add data
+  async function send(data) {
+    setLoading(true);
+    let changeFileToLink = null;
+    try {
+      changeFileToLink = await uploadFile(data.cover);
+    } catch {
+      changeFileToLink = null;
     }
-    if (data.addedData) send(data.addedData);
-  }, [data.addedData]);
+    data.cover = changeFileToLink;
+    addData("/materials", data, admin.access_token)
+      .then(({ message, data }) => {
+        setMaterials(data, "one");
+        toast.success(message);
+        setCrudDrawer(null);
+      })
+      .catch(({ message }) => {
+        if (message === errorMessages[403]) {
+          setAdmin(null);
+          router.push("/login");
+          localStorage.removeItem("user");
+        }
+        toast.error(message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
+
+  // Edit data
+  function edit(data) {
+    setLoading(true);
+    updateData("/materials/", data, admin.access_token)
+      .then(({ message, data }) => {
+        updateMaterial(data);
+        toast.success(message);
+        setCrudDrawer(null);
+      })
+      .catch(({ message }) => {
+        if (message === errorMessages[403]) {
+          setAdmin(null);
+          router.push("/login");
+          localStorage.removeItem("user");
+        }
+        toast.error(message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
 
   function handleSubmit(e) {
     e.preventDefault();
-    const action = e.nativeEvent.submitter.getAttribute("id");
 
     const result = {
       ...getFormData(e.target),
       authors: gAuthors,
       keywords: gKeywords,
       cover: gCoverImage,
+      id: edited?.id,
     };
 
     const checkedResult = validate(result, "form");
 
-    if (checkedResult === false) {
-      setData((prev) => {
-        return { ...prev, isLoading: true, addedData: result, action };
-      });
+    if (!checkedResult) {
+      if (edited) {
+        edit(result);
+      } else {
+        send(result);
+      }
     } else {
       const { target, message } = checkedResult;
       toast.warning(message);
       e.target[target]?.focus();
     }
   }
+
   return (
     <form
       onSubmit={handleSubmit}
       ref={formRef}
-      className="flex flex-col pl-1 pr-2 gap-y-6"
+      className="flex flex-col pl-1 pr-5 gap-y-6"
     >
       <div className="grid grid-cols-3 gap-x-5 gap-y-6">
         {/* Title  */}
@@ -127,8 +135,8 @@ export default function AddMaterialForm(props) {
           <Input
             type="text"
             id="title"
-            defaultValue={changeData?.title || ""}
             name="title"
+            defaultValue={edited?.title}
             placeholder="Sarlavhani kiriting"
           />
         </div>
@@ -139,8 +147,8 @@ export default function AddMaterialForm(props) {
             type="number"
             id="volume"
             name="volume"
-            defaultValue={changeData?.volume || ""}
             min="1"
+            defaultValue={edited?.volume}
             placeholder="Sahifalar sonini kiriting"
           />
         </div>
@@ -148,11 +156,7 @@ export default function AddMaterialForm(props) {
         {/* Published At */}
         <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-3">
           <span>Chop etilgan yil*</span>
-          <Select
-            name="year"
-            value={selectedYear}
-            onValueChange={setSelectedYear}
-          >
+          <Select name="publishedAt" defaultValue={edited?.publishedAt}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Chop etilgan yilni tanlang" />
             </SelectTrigger>
@@ -169,11 +173,7 @@ export default function AddMaterialForm(props) {
         {/* Country */}
         <Label className="grid w-full items-start gap-1.5">
           <span>Davlat*</span>
-          <Select
-            name="country"
-            value={selectedCountry}
-            onValueChange={setSelectedCountry}
-          >
+          <Select name="country" defaultValue={edited?.country}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Davlatni tanlang" />
             </SelectTrigger>
@@ -190,11 +190,7 @@ export default function AddMaterialForm(props) {
         {/* Language */}
         <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-4">
           <span>Til*</span>
-          <Select
-            name="language"
-            value={selectedLanguage}
-            onValueChange={setSelectedLanguage}
-          >
+          <Select name="language" defaultValue={edited?.language}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Tilni tanlang" />
             </SelectTrigger>
@@ -209,16 +205,12 @@ export default function AddMaterialForm(props) {
         </Label>
 
         {/* Cover */}
-        <UploadFile isLoading={data.isLoading} />
+        <UploadFile edited={edited?.cover} />
 
         {/* Resource type */}
         <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-3">
           <span>Resurs turi*</span>
-          <Select
-            value={selectedResourceType}
-            onValueChange={setSelectedResourceType}
-            name="resourceType"
-          >
+          <Select name="resourceType" defaultValue={edited?.resourceType}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Resurs turini tanlang" />
             </SelectTrigger>
@@ -238,8 +230,8 @@ export default function AddMaterialForm(props) {
           <Input
             type="text"
             id="source"
-            defaultValue={changeData?.source || ""}
             name="source"
+            defaultValue={edited?.source}
             placeholder="Manbaa uchun havolanini kiriting"
           />
         </div>
@@ -247,10 +239,10 @@ export default function AddMaterialForm(props) {
 
       <div className="flex flex-col gap-6">
         {/* Keywords */}
-        <KeywordsInput />
+        <KeywordsInput edited={edited?.keywords} />
 
         {/* Authors */}
-        <AuthoursInput />
+        <AuthoursInput edited={edited?.authors} />
 
         {/* Summary */}
         <div className="grid w-full gap-1.5">
@@ -259,8 +251,8 @@ export default function AddMaterialForm(props) {
             className="min-h-24"
             placeholder="Material uchun tavsif yozing..."
             id="summary"
-            defaultValue={changeData?.summary || ""}
             name="summary"
+            defaultValue={edited?.summary}
           />
         </div>
       </div>
@@ -270,7 +262,7 @@ export default function AddMaterialForm(props) {
         <Button
           onClick={() => {
             reset();
-            setAddItemDrawer(null);
+            setCrudDrawer(null);
           }}
           type="reset"
           variant="outline"
@@ -278,22 +270,25 @@ export default function AddMaterialForm(props) {
           Bekor qilish
         </Button>
 
-        {!data.isLoading && (
-          <Button type="submit" id="more" variant="secondary">
-            <PlusIcon />
-            Qo'shish
-          </Button>
-        )}
-        <Button id="one" disabled={data.isLoading}>
-          {data.isLoading ? (
+        <Button disabled={loading}>
+          {loading ? (
             <>
               <Loader2 className="animate-spin" />
-              Qo'shilmoqda...
+              {edited ? "Tahrirlanmoqda..." : "Qo'shilmoqda..."}
             </>
           ) : (
             <>
-              <BookmarkIcon />
-              Saqlash
+              {edited ? (
+                <>
+                  <Edit />
+                  Tahrirlash
+                </>
+              ) : (
+                <>
+                  <BookmarkIcon />
+                  Saqlash
+                </>
+              )}
             </>
           )}
         </Button>
