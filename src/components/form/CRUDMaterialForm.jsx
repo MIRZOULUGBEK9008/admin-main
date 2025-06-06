@@ -17,7 +17,7 @@ import { BookmarkIcon } from "@radix-ui/react-icons";
 import { getFormData, validate } from "@/lib/utils";
 import { useAppStore } from "@/lib/zustand";
 import { toast } from "sonner";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Edit, Loader2 } from "lucide-react";
 import { addData, updateData, uploadFile } from "@/requests";
 import UploadFile from "./UploadFile";
@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation";
 export default function CRUDMaterialForm({ edited }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [resourceType, setResourceType] = useState(null);
 
   const formRef = useRef(null);
 
@@ -122,6 +123,10 @@ export default function CRUDMaterialForm({ edited }) {
     }
   }
 
+  function handleResourceTypes(value) {
+    setResourceType(value);
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -129,6 +134,39 @@ export default function CRUDMaterialForm({ edited }) {
       className="flex flex-col pl-1 pr-5 gap-y-6"
     >
       <div className="grid grid-cols-3 gap-x-5 gap-y-6">
+        {/* Resource type */}
+        <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-3">
+          <span>Resurs turi*</span>
+          <Select
+            onValueChange={handleResourceTypes}
+            name="resourceType"
+            defaultValue={edited?.resourceType}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Resurs turini tanlang" />
+            </SelectTrigger>
+            <SelectContent>
+              {form.resourceTypes.map((resourceType) => (
+                <SelectItem key={resourceType} value={resourceType}>
+                  {resourceType}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Label>
+
+        {/* Source */}
+        <div className="grid w-full items-center gap-1.5">
+          <Label htmlFor="source">Manbaa*</Label>
+          <Input
+            type="text"
+            id="source"
+            name="source"
+            defaultValue={edited?.source}
+            placeholder="Manbaa uchun havolanini kiriting"
+          />
+        </div>
+
         {/* Title  */}
         <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="title">Sarlavha*</Label>
@@ -140,18 +178,32 @@ export default function CRUDMaterialForm({ edited }) {
             placeholder="Sarlavhani kiriting"
           />
         </div>
-        {/* Volume  */}
-        <div className="grid w-full items-center gap-1.5 col-start-2 col-end-4">
-          <Label htmlFor="volume">Sahifalar soni*</Label>
-          <Input
-            type="number"
-            id="volume"
-            name="volume"
-            min="1"
-            defaultValue={edited?.volume}
-            placeholder="Sahifalar sonini kiriting"
-          />
-        </div>
+
+        {/* Size  */}
+        {resourceType === "Video" ? (
+          <div className="grid w-full items-center gap-1.5 col-start-2 col-end-4">
+            <Label htmlFor="size">Davomiylik*</Label>
+            <Input
+              type="text"
+              id="size"
+              name="size"
+              defaultValue={edited?.size}
+              placeholder="Davomiylikni kiriting"
+            />
+          </div>
+        ) : (
+          <div className="grid w-full items-center gap-1.5 col-start-2 col-end-4">
+            <Label htmlFor="size">Sahifalar soni*</Label>
+            <Input
+              type="number"
+              id="size"
+              name="size"
+              min="1"
+              defaultValue={edited?.size}
+              placeholder="Sahifalar sonini kiriting"
+            />
+          </div>
+        )}
 
         {/* Published At */}
         <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-3">
@@ -206,35 +258,6 @@ export default function CRUDMaterialForm({ edited }) {
 
         {/* Cover */}
         <UploadFile edited={edited?.cover} />
-
-        {/* Resource type */}
-        <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-3">
-          <span>Resurs turi*</span>
-          <Select name="resourceType" defaultValue={edited?.resourceType}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Resurs turini tanlang" />
-            </SelectTrigger>
-            <SelectContent>
-              {form.resourceTypes.map((resourceType) => (
-                <SelectItem key={resourceType} value={resourceType}>
-                  {resourceType}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Label>
-
-        {/* Source */}
-        <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="source">Manbaa*</Label>
-          <Input
-            type="text"
-            id="source"
-            name="source"
-            defaultValue={edited?.source}
-            placeholder="Manbaa uchun havolanini kiriting"
-          />
-        </div>
       </div>
 
       <div className="flex flex-col gap-6">

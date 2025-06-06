@@ -54,7 +54,7 @@ export default function UploadFile({ edited }) {
 
   return (
     <div>
-      <div className="grid w-full items-center gap-1.5 ">
+      <div className="grid w-full items-center gap-1.5">
         <Label htmlFor="cover">Rasm uchun havola*</Label>
         <div className="flex gap-3">
           {gCoverImage === null ? (

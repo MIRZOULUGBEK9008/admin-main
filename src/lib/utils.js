@@ -54,6 +54,20 @@ export function validate(element, type) {
       keywords,
     } = element;
 
+    if (!resourceType) {
+      return {
+        target: "resourceType",
+        message: warnMessages.empty.resourceType,
+      };
+    }
+
+    if (!isURL(source)) {
+      return {
+        target: "source",
+        message: warnMessages.empty.source,
+      };
+    }
+
     if (title?.trim().length === 0) {
       return {
         target: "title",
@@ -61,10 +75,10 @@ export function validate(element, type) {
       };
     }
 
-    if (volume?.trim().length === 0) {
+    if (size?.trim().length === 0) {
       return {
-        target: "volume",
-        message: warnMessages.empty.volume,
+        target: "size",
+        message: warnMessages.empty.size,
       };
     }
 
@@ -88,20 +102,6 @@ export function validate(element, type) {
 
     if (!language) {
       return { target: "language", message: warnMessages.empty.language };
-    }
-
-    if (!resourceType) {
-      return {
-        target: "resourceType",
-        message: warnMessages.empty.resourceType,
-      };
-    }
-
-    if (!isURL(source)) {
-      return {
-        target: "source",
-        message: warnMessages.empty.source,
-      };
     }
 
     if (keywords?.length === 0) {
