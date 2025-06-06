@@ -42,7 +42,7 @@ export function validate(element, type) {
 
     const {
       title,
-      volume,
+      size,
       cover,
       publishedAt,
       country,
