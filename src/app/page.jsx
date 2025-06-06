@@ -5,12 +5,20 @@ import { useEffect } from "react";
 import TableData from "@/components/TableData";
 import Header from "@/components/Header";
 import UniversalDrawer from "@/components/UniversalDrawer";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import CRUDMaterialForm from "@/components/form/CRUDMaterialForm";
+import { ChartNoAxesCombined } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { getStatistics } from "@/lib/utils";
 
 export default function page() {
-  const { admin, setCrudDrawer, setAdmin } = useAppStore();
+  const { admin, setCrudDrawer, setAdmin, materials } = useAppStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -34,6 +42,16 @@ export default function page() {
     });
   }
 
+  function handleStatistics() {
+    let ui = "";
+    const result = getStatistics(materials);
+    Object.entries(result).forEach((el) => {
+      const res = el.join(": ");
+      ui += `\n ${res}`;
+    });
+    alert(ui);
+  }
+
   return (
     <>
       <Header />
@@ -42,10 +60,26 @@ export default function page() {
           <h2 className="text-3xl font-semibold tracking-tight first:mt-0">
             Boshqaruv paneli
           </h2>
-          <Button onClick={handleDrawer} variant="outline">
-            <PlusCircledIcon />
-            Qo'shish
-          </Button>
+          <div className="flex gap-5">
+            <TooltipProvider delayDuration="0">
+              <Tooltip>
+                <TooltipTrigger
+                  onClick={handleStatistics}
+                  disabled={materials.length === 0}
+                  className={`${buttonVariants({ size: "icon" })}`}
+                >
+                  <ChartNoAxesCombined />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Statistikani ko'rish</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <Button onClick={handleDrawer} variant="outline">
+              <PlusCircledIcon />
+              Qo'shish
+            </Button>
+          </div>
         </div>
         <TableData />
       </main>

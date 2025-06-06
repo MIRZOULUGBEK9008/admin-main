@@ -146,3 +146,15 @@ export function getUntilNow(start) {
   }
   return years;
 }
+
+export function getStatistics(materials) {
+  const result = {};
+  materials.forEach(({ resourceType }) => {
+    if (resourceType in result) {
+      result[resourceType] += 1;
+    } else {
+      result[resourceType] = 1;
+    }
+  });
+  return result;
+}
